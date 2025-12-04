@@ -1,15 +1,25 @@
 /* eslint-disable */
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { getTodos, getUser } from '../../api';
-import { actions as todosActions } from '../../features/todos';
+import { getUser } from '../../api';
 import { actions as currentTodoActions } from '../../features/currentTodo';
 import { Todo } from '../../types/Todo';
 
 export const TodoList: React.FC = () => {
   const { todos, error } = useAppSelector(state => state.todos);
-  const { status, query }= useAppSelector(state => state.filter)
   const dispatch = useAppDispatch();
+  const { status, query } = useAppSelector(state => state.filter);
+
+  const filteredTodos = todos
+    .filter(todo => {
+      if (status === 'active') return !todo.completed;
+      if (status === 'completed') return todo.completed;
+      return true;
+    })
+    .filter(todo => {
+      if (!query.trim()) return true;
+      return todo.title.toLowerCase().includes(query.trim().toLowerCase());
+    });
 
   const handleOpenModal = (todo: Todo) => {
     dispatch(currentTodoActions.setCurrentTodo(todo));
@@ -25,59 +35,13 @@ export const TodoList: React.FC = () => {
     });
   };
 
-  useEffect(() => {
-    dispatch(todosActions.setLoading(true));
-
-    getTodos()
-      .then(todosFromServer => {
-        let result = todosFromServer;
-
-        switch (status) {
-          case 'active':
-            result = result.filter(todo => !todo.completed);
-            break;
-
-          case 'completed':
-            result = result.filter(todo => todo.completed);
-            break;
-
-          default:
-            break;
-        }
-
-        if (query.trim()) {
-          const normalized = query.trim().toLowerCase();
-          result = result.filter(todo =>
-            todo.title.toLowerCase().includes(normalized)
-          );
-        }
-
-        if (result.length === 0) {
-          dispatch(todosActions.setError(
-            'There are no todos matching current filter criteria'
-          ));
-        } else {
-          dispatch(todosActions.setError(null));
-        }
-
-        dispatch(todosActions.setTodos(result));
-      })
-      .catch(() =>
-        dispatch(todosActions.setError(
-          'Failed to load todos from server'
-        ))
-      )
-      .finally(() => {
-        dispatch(todosActions.setLoading(false));
-      });
-  }, [status, query]);
-
   return (
     <>
-      {error && (
+      {filteredTodos.length === 0 && (
         <p className="notification is-warning">
-          {error}
-        </p>)}
+          There are no todos matching current filter criteria
+        </p>
+      )}
 
       <table className="table is-narrow is-fullwidth">
         <thead>
@@ -96,7 +60,7 @@ export const TodoList: React.FC = () => {
         </thead>
 
         <tbody>
-          {todos.map(todo => (
+          {filteredTodos.map(todo => (
             <tr data-cy="todo">
               <td className="is-vcentered">{todo.id}</td>
 

@@ -4,7 +4,9 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { actions as currentTodoActions } from '../../features/currentTodo';
 
 export const TodoModal: React.FC = () => {
-  const {todo, user, modalLoading} = useAppSelector(state => state.currentTodo);
+  const { todo, user, modalLoading } = useAppSelector(
+    state => state.currentTodo,
+  );
   const dispatch = useAppDispatch();
 
   const handleCloseModal = () => {
@@ -33,7 +35,6 @@ export const TodoModal: React.FC = () => {
             data-cy="modal-close"
             onClick={handleCloseModal}
           />
-
         </header>
 
         <div className="modal-card-body">
@@ -45,7 +46,7 @@ export const TodoModal: React.FC = () => {
             {todo.completed ? (
               <strong className="has-text-success">Done</strong>
             ) : (
-            <strong className="has-text-danger">Planned</strong>
+              <strong className="has-text-danger">Planned</strong>
             )}
             {' by '}
             <a href={user.email}>{user.name}</a>

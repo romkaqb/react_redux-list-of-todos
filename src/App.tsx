@@ -1,13 +1,33 @@
 import 'bulma/css/bulma.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import { Loader, TodoFilter, TodoList, TodoModal } from './components';
-import { useAppSelector } from './app/hooks';
+import { useAppDispatch, useAppSelector } from './app/hooks';
+import { actions as todosActions } from './features/todos';
+import { useEffect } from 'react';
+import { getTodos } from './api';
 
 export const App = () => {
   const loading = useAppSelector(state => state.todos.loading);
   const isModalOpened = useAppSelector(
     state => state.currentTodo.isModalOpened,
   );
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(todosActions.setLoading(true));
+
+    getTodos()
+      .then(todosFromServer => {
+        dispatch(todosActions.setTodos(todosFromServer));
+        dispatch(todosActions.setError(null));
+      })
+      .catch(() => {
+        dispatch(todosActions.setError('Failed to load todos from server'));
+      })
+      .finally(() => {
+        dispatch(todosActions.setLoading(false));
+      });
+  }, []);
 
   return (
     <>
