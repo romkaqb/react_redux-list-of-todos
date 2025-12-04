@@ -3,15 +3,15 @@ import { Todo } from '../types/Todo';
 import { User } from '../types/User';
 
 type InitialStateType = {
-  todo: Todo;
-  user: User;
+  todo: null | Todo;
+  user: null |User;
   isModalOpened: boolean;
   modalLoading: boolean;
 };
 
 const initialState: InitialStateType = {
-  todo: {} as Todo,
-  user: {} as User,
+  todo: null,
+  user: null,
   isModalOpened: false,
   modalLoading: false,
 };

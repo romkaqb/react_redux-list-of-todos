@@ -25,9 +25,7 @@ export const TodoList: React.FC = () => {
     dispatch(currentTodoActions.setCurrentTodo(todo));
     dispatch(currentTodoActions.setModalLoading(true));
     dispatch(currentTodoActions.toggleModal(true));
-    setTimeout(() => {
-      dispatch(currentTodoActions.setModalLoading(false));
-    }, 1000)
+    dispatch(currentTodoActions.setModalLoading(false));
 
     getUser(todo.userId).then(user => {
       dispatch(currentTodoActions.setCurrentUser(user));

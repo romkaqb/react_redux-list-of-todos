@@ -8,9 +8,10 @@ import { getTodos } from './api';
 
 export const App = () => {
   const loading = useAppSelector(state => state.todos.loading);
-  const isModalOpened = useAppSelector(
-    state => state.currentTodo.isModalOpened,
+  const { isModalOpened, user } = useAppSelector(
+    state => state.currentTodo,
   );
+
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -19,7 +20,7 @@ export const App = () => {
     getTodos()
       .then(todosFromServer => {
         dispatch(todosActions.setTodos(todosFromServer));
-        dispatch(todosActions.setError(null));
+        dispatch(todosActions.setError(''));
       })
       .catch(() => {
         dispatch(todosActions.setError('Failed to load todos from server'));
@@ -48,7 +49,7 @@ export const App = () => {
         </div>
       </div>
 
-      {isModalOpened && <TodoModal />}
+      {isModalOpened && user && <TodoModal />}
     </>
   );
 };
